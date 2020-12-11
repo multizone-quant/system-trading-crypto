@@ -223,3 +223,71 @@ class MyUpbit(Exchange):
 
 if __name__ == "__main__":
     print("jpy_upbit")
+
+
+    with open(".\\upbit.txt") as f:
+        lines = f.readlines()
+        access = lines[0].strip()
+        secret = lines[1].strip()
+
+    # Upbit
+    upbit = MyUpbit(access, secret)
+
+    if 1 :
+        # 잔고 조회
+        print('== balance ex == ')
+        bals = upbit.get_balances(ticker="KRW") # 원화 잔고
+        bal = bals[0]
+        if 'error' in bal :
+            print(bal['error']['message']) 
+        else :
+            print(bal['ticker'], bal['total'], bal['orderable'])
+
+        bals = upbit.get_balances(ticker="KRW-STEEM") # 특정 코인
+        bal = bals[0]
+        if 'error' in bal :
+            print(bal['error']['message']) 
+        else :
+            print(bal['ticker'], bal['total'], bal['orderable'])
+
+        bals = upbit.get_balances(ticker="ALL") # 모든 잔고
+        print(bals)
+        bal = bals[0]
+        if 'error' in bal :
+            print(bal['error']['message']) 
+        else :
+            for bal in bals :
+                print(bal['ticker'], bal['total'], bal['orderable'])
+
+
+        print('-- get pending_orders --')
+        orders = upbit.pending_orders('KRW-BTC')  # or 'ALL'
+        if 'error' in orders :
+            print(bal['error']['message']) 
+        else :
+            print (orders[0])
+            for ord in orders[0] :
+                print(ord['ticker'], ord['uuid'], ord['ask_bid'], ord['price'], ord['qty'], ord['executed_qty'])
+    
+    if 0:
+        print('-- test trading --')
+        # 매수
+        ret = upbit.buy_limit_order("KRW-STEEM", 150, 10)    # price, qty
+        print('buy  : ', ret[0]['uuid'])
+
+        #매도
+        ret = upbit.sell_limit_order("KRW-STEEM", 500, 10)  # price, qty
+        print('sell : ', ret[0]['uuid'])
+
+        uuid = ret[0]['uuid']
+        # 주문 취소
+        ret = upbit.cancel_order(uuid)
+        print('cancel : ', ret[0]['uuid'])
+
+        # 시장가 주문 테스트, ok!
+        ret = upbit.buy_market_order("KRW-STEEM", 1000)
+        print('market buy : ', ret[0]['uuid'])
+
+        # 시장가 매도 테스트, ok!
+        ret = upbit.sell_market_order("KRW-STEEM", 5.43)
+        print('market sell : ', ret[0]['uuid'])    
