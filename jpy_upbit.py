@@ -31,7 +31,7 @@ class MyUpbit(Exchange):
         특정 혹은 전체 코인 잔고 조회
         기존 pyupbit에서는 주문 가능한 잔고만 넘어옴. 
             bal 형태로 돌려주도록 수정함
-        :param ticker: 모든 ticker를 원하면 'all' 아니면 특정 ticker
+        :param ticker: 모든 ticker를 원하면 'ALL' 아니면 특정 ticker
         :return 
         :       [bal1, bal2, ...] :  bal = {'ticker':ticker, 'total':0, 'orderable':0}
         :           ['total']은 전체 잔고, ['orderable']은 주문 가능 수량
@@ -41,7 +41,7 @@ class MyUpbit(Exchange):
         :   ret = get_balance('BTC'):
         :   print(ret[0])
         :
-        :   ret = get_balance('all'):
+        :   ret = get_balance('ALL'):
         :   print(ret)
         """
 
@@ -67,7 +67,7 @@ class MyUpbit(Exchange):
         if orders == None :
             # 오류
             return [{'error':{'message':'err pending_orders'}}]
-        elif 'error' in orders[0] :
+        elif 'error' in orders :
             # 오류
             return orders
         else :
@@ -79,10 +79,10 @@ class MyUpbit(Exchange):
                 return [ord]
         return [{'error':{'message':'not existing order'}}]
 
-    def pending_orders(self, ticker='all'):
+    def pending_orders(self, ticker='ALL'):
         """
         현재 미체결 주문 조회
-        :param ticker: 모든 ticker를 워하면 'all' 아니면 특정 ticker
+        :param ticker: 모든 ticker를 워하면 'ALL' 아니면 특정 ticker
         :return 
         :    아래 구조로 돌려줌
         :    [
@@ -105,13 +105,13 @@ class MyUpbit(Exchange):
         if orders == None :
             # 오류
             return [{'error':{'message':'err pending_orders'}}]
-        elif 'error' in orders[0] :
+        elif 'error' in orders :
             # 오류
             return orders
 
         else :
             for ord in orders :
-                if ticker != 'all' :
+                if ticker != 'ALL' :
                     if ord['market'] != ticker :
                         continue
                 side_type = 'sell'
