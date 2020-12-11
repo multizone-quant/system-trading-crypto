@@ -14,6 +14,12 @@
 # pip uninstall jwt
 # pip install -U pyjwt
 
+#
+# <동작 중 문제가 생기는 경우>
+# jwt encoder를 찾지 못하는 오류가 나오면 아래와 같이 pyjwt 설치가 필요함
+# pip uninstall jwt
+# pip install -U pyjwt
+
 import pyupbit
 from pyupbit.exchange_api import *
 
@@ -34,7 +40,7 @@ class MyUpbit(Exchange):
         특정 혹은 전체 코인 잔고 조회
         기존 pyupbit에서는 주문 가능한 잔고만 넘어옴. 
             bal 형태로 돌려주도록 수정함
-        :param ticker: 모든 ticker를 원하면 'ALL' 아니면 특정 ticker
+        :param ticker: 모든 ticker를 원하면 'all' 아니면 특정 ticker
         :return 
         :       [bal1, bal2, ...] :  bal = {'ticker':ticker, 'total':0, 'orderable':0}
         :           ['total']은 전체 잔고, ['orderable']은 주문 가능 수량
@@ -47,10 +53,7 @@ class MyUpbit(Exchange):
         :   ret = get_balance('ALL'):
         :   print(ret)
         """
-
         return self.exchange.get_balances(ticker)
-
-
 
     def pending_order(self, uuid):
         """
@@ -65,12 +68,11 @@ class MyUpbit(Exchange):
         #  'paid_fee': '0.0', 'price': '44.7', 'remaining_fee': '0.0', 'remaining_volume': '100000.0', 'reserved_fee': '0.0', 
         #  'side': 'ask', 'state': 'wait', 'trades_count': 0, 'uuid': 'c3b8e35e-d13e-42d5-...de1f482a6', ...}
         """
-
         orders = self.pending_orders()
         if orders == None :
             # 오류
             return [{'error':{'message':'err pending_orders'}}]
-        elif 'error' in orders :
+        elif 'error' in orders[0] :
             # 오류
             return orders
         else :
@@ -82,10 +84,13 @@ class MyUpbit(Exchange):
                 return [ord]
         return [{'error':{'message':'not existing order'}}]
 
-    def pending_orders(self, ticker='ALL'):
+    def completed_orders(self, ticker='ALL', state='done'):
+        return self.pending_orders(ticker, state)
+
+    def pending_orders(self, ticker='ALL', state='wait'):
         """
         현재 미체결 주문 조회
-        :param ticker: 모든 ticker를 워하면 'ALL' 아니면 특정 ticker
+        :param ticker: 모든 ticker를 워하면 'all' 아니면 특정 ticker
         :return 
         :    아래 구조로 돌려줌
         :    [
@@ -97,13 +102,12 @@ class MyUpbit(Exchange):
         :    ]
         :    오류인 경우에는 [0]에 오류메세지
         """
-        orders = self.exchange.get_order(ticker, state='wait', kind='normal', contain_req=False)
+        orders = self.exchange.get_order(ticker, state=state, kind='normal', contain_req=False)
         # {'created_at': '2020-11-24T14:25:47+09:00', 'executed_volume': '0.0', 'locked': '100000.0', 'market': 'KRW-TRX', 'ord_type': 'limit',
         #  'paid_fee': '0.0', 'price': '44.7', 'remaining_fee': '0.0', 'remaining_volume': '100000.0', 'reserved_fee': '0.0', 
         #  'side': 'ask', 'state': 'wait', 'trades_count': 0, 'uuid': 'c3b8e35e-d13e-42d5-...de1f482a6', ...}
         result1 = []
         result2 = []
-
 
         if orders == None :
             # 오류
@@ -111,7 +115,6 @@ class MyUpbit(Exchange):
         elif 'error' in orders :
             # 오류
             return [orders]
-
         else :
             for ord in orders :
                 if ticker != 'ALL' :
@@ -136,8 +139,9 @@ class MyUpbit(Exchange):
 
             return res
 
-    def buy_market_order(self, ticker, price, qty, contain_req=False):
-        return self.buy_order('market', ticker, price, qty, contain_req)
+    # amount 만큼 매수 (수량은 order book에 따라 가변)
+    def buy_market_order(self, ticker, amount, contain_req=False):
+        return self.buy_order('market', ticker, amount, 0, contain_req)
 
     def buy_limit_order(self, ticker, price, qty, contain_req=False):
         return self.buy_order('limit', ticker, price, qty, contain_req)
@@ -165,8 +169,9 @@ class MyUpbit(Exchange):
 
         return result
 
-    def sell_market_order(self, ticker, price, qty, contain_req=False):
-        return self.sell_order('market', ticker, price, qty, contain_req)
+    # qty를 시장가에 판다.
+    def sell_market_order(self, ticker, qty, contain_req=False):
+        return self.sell_order('market', ticker, 0, qty, contain_req)
 
     def sell_limit_order(self, ticker, price, qty, contain_req=False):
         return self.sell_order('limit', ticker, price, qty, contain_req)
@@ -223,7 +228,6 @@ class MyUpbit(Exchange):
 
 if __name__ == "__main__":
     print("jpy_upbit")
-
 
     with open(".\\upbit.txt") as f:
         lines = f.readlines()
@@ -290,4 +294,5 @@ if __name__ == "__main__":
 
         # 시장가 매도 테스트, ok!
         ret = upbit.sell_market_order("KRW-STEEM", 5.43)
-        print('market sell : ', ret[0]['uuid'])    
+        print('market sell : ', ret[0]['uuid'])
+
