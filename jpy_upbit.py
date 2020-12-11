@@ -1,22 +1,28 @@
+# pyupbit wrapper
+# upbit 거래소 lib는 pyupbit 사용함
+# https://github.com/sharebook-kr/pyupbit
+#
+# 거래소 마다 API를 통하여 받을 수 있는 값이 틀리기 때문에 통일된 형태로 정의함
+# class Exchange를 base로 거래소마다 서로 다른 형태의 값을 같은 형태로 전환하는 wrapper class임
+# upbit은 아래 github에 있는 pyupbit을 사용함.
+# https://github.com/sharebook-kr/pyupbit
+# 단 몇몇 함수의 return 값 변경하였고, 신규 함수도 추가함. 자세한 사항은 fork한 pyupbit 참고
+#   branch : my_upbit-0.2
+#
+# 보다 자세한 사항은 아래 tistory 참고
+# https://money-expert.tistory.com/40
+#
+
 # jwt encoder를 찾지 못하는 오류가 나오면 아래와 같이 pyjwt 설치가 필요함
 # pip uninstall jwt
 # pip install -U pyjwt
 
 import pyupbit
-if __name__ == "__main__":
-    import sys
-    sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-    from pyupbit.exchange_api import *
-else :
-    from pyupbit.exchange_api import *
+from pyupbit.exchange_api import *
 
 from jpy_basic_ex import *
 
 UPBIT_TRADING_FEE = 0.035
-
-# 거래소별 공통으로 데이터를 주고 받을 수 있도록 wrapper 추가
-# upbit 거래소 lib는 pyupbit 사용함
-# https://github.com/sharebook-kr/pyupbit
 
 class MyUpbit(Exchange):
     def __init__(self, access, secret):
