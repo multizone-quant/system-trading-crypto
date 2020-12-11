@@ -1,9 +1,6 @@
-# pyupbit wrapper
-# upbit 거래소 lib는 pyupbit 사용함
-# https://github.com/sharebook-kr/pyupbit
-#
 # 거래소 마다 API를 통하여 받을 수 있는 값이 틀리기 때문에 통일된 형태로 정의함
 # class Exchange를 base로 거래소마다 서로 다른 형태의 값을 같은 형태로 전환하는 wrapper class임
+#
 # upbit은 아래 github에 있는 pyupbit을 사용함.
 # https://github.com/sharebook-kr/pyupbit
 # 단 몇몇 함수의 return 값 변경하였고, 신규 함수도 추가함. 자세한 사항은 fork한 pyupbit 참고
