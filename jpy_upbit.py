@@ -110,7 +110,7 @@ class MyUpbit(Exchange):
             return [{'error':{'message':'err pending_orders'}}]
         elif 'error' in orders :
             # 오류
-            return orders
+            return [orders]
 
         else :
             for ord in orders :
