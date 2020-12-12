@@ -10,6 +10,7 @@ import csv
 from  datetime import datetime
 import time
 
+from my_util import *
 from jpy_upbit import *
 from TR_FOLLOW import *
 
